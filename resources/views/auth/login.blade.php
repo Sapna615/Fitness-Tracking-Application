@@ -23,7 +23,7 @@
         <button type="submit" class="btn btn-primary w-full py-2 fw-bold text-white w-100">Login to Dashboard</button>
         
         <div class="text-center mt-4">
-            <p class="text-muted small">Don't have an account? <a href="{{ route('register') }}" class="text-primary fw-bold">Sign up</a></p>
+            <p class="text-muted small">Don't have an account? <a href="{{ secure_url('register') }}" class="text-primary fw-bold">Sign up</a></p>
         </div>
     </form>
 </x-guest-layout>

@@ -30,4 +30,4 @@ RUN composer install
 EXPOSE 8000
 
 # Run Laravel
-CMD php artisan config:clear && php artisan cache:clear && php artisan serve --host=0.0.0.0 --port=8000
+CMD php artisan config:clear && php artisan cache:clear && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=8000

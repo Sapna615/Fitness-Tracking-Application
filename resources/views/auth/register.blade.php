@@ -29,7 +29,7 @@
         <button type="submit" class="btn btn-primary w-full py-2 fw-bold text-white w-100">Create Account</button>
         
         <div class="text-center mt-4">
-            <p class="text-muted small">Already a member? <a href="{{ route('login') }}" class="text-primary fw-bold">Login here</a></p>
+            <p class="text-muted small">Already a member? <a href="{{ secure_url('login') }}" class="text-primary fw-bold">Login here</a></p>
         </div>
     </form>
 </x-guest-layout>
