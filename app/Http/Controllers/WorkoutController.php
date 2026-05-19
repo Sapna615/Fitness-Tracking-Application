@@ -15,7 +15,7 @@ class WorkoutController extends Controller
     {
         $user = Auth::user();
         $workoutPlans = WorkoutPlan::where('user_id', $user->id)
-            ->with('workout')
+            ->with('workout.exercises')
             ->get()
             ->groupBy('day');
 
@@ -24,7 +24,7 @@ class WorkoutController extends Controller
             $planService->generateForUser($user);
             
             $workoutPlans = WorkoutPlan::where('user_id', $user->id)
-                ->with('workout')
+                ->with('workout.exercises')
                 ->get()
                 ->groupBy('day');
         }
