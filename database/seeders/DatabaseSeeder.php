@@ -21,5 +21,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Seed workouts, exercises, and workout plans
+        $this->call(FitnessDataSeeder::class);
+        $this->call(AchievementSeeder::class);
     }
 }

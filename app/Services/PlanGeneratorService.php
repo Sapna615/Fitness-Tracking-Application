@@ -17,84 +17,71 @@ class PlanGeneratorService
         $user->workoutPlans()->delete();
         $user->dietPlans()->delete();
 
+        // Assign the day-specific workouts that were created by FitnessDataSeeder
+        $this->assignDayWorkouts($user, $profile->fitness_goal);
+
+        // Generate diet plan based on fitness goal
         if ($profile->fitness_goal === 'weight_loss') {
-            $this->generateWeightLossPlan($user);
+            $this->createWeightLossDiet($user);
         } else if ($profile->fitness_goal === 'muscle_gain') {
-            $this->generateMuscleGainPlan($user);
+            $this->createMuscleGainDiet($user);
         } else {
-            $this->generateMaintenancePlan($user);
+            $this->createMaintenanceDiet($user);
         }
     }
 
-    private function generateWeightLossPlan(User $user)
+    private function assignDayWorkouts(User $user, $fitnessGoal)
     {
-        $workouts = Workout::where('difficulty_level', 'Beginner')->limit(3)->get();
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        // Map of day => workout title (matching FitnessDataSeeder)
+        $dayWorkoutMap = [
+            'Monday' => ['title' => 'Chest & Triceps Workout', 'sets' => 4, 'reps' => 10],
+            'Tuesday' => ['title' => 'Leg Day Training', 'sets' => 4, 'reps' => 12],
+            'Wednesday' => ['title' => 'Yoga & Core Stability', 'sets' => 3, 'reps' => 30],
+            'Thursday' => ['title' => 'Back & Biceps Workout', 'sets' => 4, 'reps' => 10],
+            'Friday' => ['title' => 'HIIT Cardio Session', 'sets' => 5, 'reps' => 40],
+            'Saturday' => ['title' => 'Shoulders & Abs', 'sets' => 4, 'reps' => 12],
+        ];
 
-        if ($workouts->isNotEmpty()) {
-            foreach ($days as $index => $day) {
-                if (isset($workouts[$index % count($workouts)])) {
-                    WorkoutPlan::create([
-                        'user_id' => $user->id,
-                        'workout_id' => $workouts[$index % count($workouts)]->id,
-                        'day' => $day,
-                        'sets' => 4,
-                        'reps' => 20
-                    ]);
-                }
+        // Adjust sets/reps based on fitness goal
+        $modifier = match ($fitnessGoal) {
+            'weight_loss' => ['sets_mod' => 0, 'reps_mod' => 5],      // Higher reps for fat burn
+            'muscle_gain' => ['sets_mod' => 1, 'reps_mod' => -2],     // More sets, fewer reps for strength
+            default => ['sets_mod' => 0, 'reps_mod' => 0],            // Maintenance: use defaults
+        };
+
+        foreach ($dayWorkoutMap as $day => $data) {
+            $workout = Workout::where('title', $data['title'])->first();
+
+            if ($workout) {
+                WorkoutPlan::create([
+                    'user_id' => $user->id,
+                    'workout_id' => $workout->id,
+                    'day' => $day,
+                    'sets' => max(1, $data['sets'] + $modifier['sets_mod']),
+                    'reps' => max(1, $data['reps'] + $modifier['reps_mod']),
+                ]);
             }
         }
+    }
 
+    private function createWeightLossDiet(User $user)
+    {
         $this->createMeal($user, 'Breakfast', 'Green Smoothie & Boiled Egg', 350);
         $this->createMeal($user, 'Lunch', 'Quinoa with Roasted Veggies', 500);
         $this->createMeal($user, 'Snack', 'Apple & Handful of Almonds', 200);
         $this->createMeal($user, 'Dinner', 'Grilled Fish with Asparagus', 450);
     }
 
-    private function generateMuscleGainPlan(User $user)
+    private function createMuscleGainDiet(User $user)
     {
-        $workouts = Workout::where('difficulty_level', 'Intermediate')->limit(3)->get();
-        $days = ['Monday', 'Tuesday', 'Thursday', 'Friday', 'Saturday'];
-
-        if ($workouts->isNotEmpty()) {
-            foreach ($days as $index => $day) {
-                if (isset($workouts[$index % count($workouts)])) {
-                    WorkoutPlan::create([
-                        'user_id' => $user->id,
-                        'workout_id' => $workouts[$index % count($workouts)]->id,
-                        'day' => $day,
-                        'sets' => 4,
-                        'reps' => 10
-                    ]);
-                }
-            }
-        }
-
         $this->createMeal($user, 'Breakfast', 'Oatmeal with Peanut Butter & Whey', 600);
         $this->createMeal($user, 'Lunch', 'Lean Beef with Sweet Potato & Broccoli', 850);
         $this->createMeal($user, 'Snack', 'Greek Yogurt with Honey & Granola', 400);
         $this->createMeal($user, 'Dinner', 'Chicken Breast with Pasta & Pesto', 750);
     }
 
-    private function generateMaintenancePlan(User $user)
+    private function createMaintenanceDiet(User $user)
     {
-        $workouts = Workout::where('difficulty_level', 'Beginner')->limit(3)->get();
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-        if ($workouts->isNotEmpty()) {
-            foreach ($days as $index => $day) {
-                if (isset($workouts[$index % count($workouts)])) {
-                    WorkoutPlan::create([
-                        'user_id' => $user->id,
-                        'workout_id' => $workouts[$index % count($workouts)]->id,
-                        'day' => $day,
-                        'sets' => 3,
-                        'reps' => 12
-                    ]);
-                }
-            }
-        }
-
         $this->createMeal($user, 'Breakfast', 'Whole Grain Toast with Avocado', 450);
         $this->createMeal($user, 'Lunch', 'Turkey & Cheese Wrap', 600);
         $this->createMeal($user, 'Snack', 'Banana', 100);
