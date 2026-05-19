@@ -131,7 +131,7 @@ class FitnessDataSeeder extends Seeder
 
         // Ensure admin users are marked correctly
         // Mark the first user as admin, and any user with specific admin emails
-        $adminEmails = ['test@example.com', 'admin@fitness.com', 'sapna@admin.com'];
+        $adminEmails = ['test@example.com', 'sapnarai2005@gmail.com'];
         User::whereIn('email', $adminEmails)->update(['is_admin' => true]);
         
         // Also mark the very first registered user as admin (fallback)
