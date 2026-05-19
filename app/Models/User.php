@@ -14,7 +14,7 @@ use App\Models\WorkoutPlan;
 use App\Models\DietPlan;
 use App\Models\Progress;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'is_admin'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {

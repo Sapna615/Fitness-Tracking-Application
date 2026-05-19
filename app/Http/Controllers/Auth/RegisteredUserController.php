@@ -42,6 +42,12 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Make the first registered user an admin automatically
+        if (User::count() <= 1) {
+            $user->is_admin = true;
+            $user->save();
+        }
+
         event(new Registered($user));
 
         Auth::login($user);

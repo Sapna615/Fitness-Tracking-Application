@@ -129,6 +129,19 @@ class FitnessDataSeeder extends Seeder
             echo "  Assigned 6-day plan to user: {$user->email}\n";
         }
 
+        // Ensure admin users are marked correctly
+        // Mark the first user as admin, and any user with specific admin emails
+        $adminEmails = ['test@example.com', 'admin@fitness.com', 'sapna@admin.com'];
+        User::whereIn('email', $adminEmails)->update(['is_admin' => true]);
+        
+        // Also mark the very first registered user as admin (fallback)
+        $firstUser = User::orderBy('created_at', 'asc')->first();
+        if ($firstUser) {
+            $firstUser->is_admin = true;
+            $firstUser->save();
+            echo "  Marked {$firstUser->email} as admin\n";
+        }
+
         echo "FitnessDataSeeder completed successfully!\n";
     }
 }
